@@ -1,0 +1,19 @@
+require:
+  - rubocop-performance
+  - rubocop-minitest
+
+AllCops:
+  NewCops: enable
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Layout/IndentationConsistency:
+  EnforcedStyle: indented_internal_methods
+
+# Would like to enable, but there's no way to ignore trailing whitespace in comments.
+Layout/TrailingWhitespace:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
