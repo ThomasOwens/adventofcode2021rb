@@ -20,3 +20,6 @@ Metrics/MethodLength:
 
 Style/Documentation:
   Enabled: false
+
+Style/NumericLiterals:
+  Enabled: false
