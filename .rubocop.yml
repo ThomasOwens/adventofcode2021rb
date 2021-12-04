@@ -18,6 +18,9 @@ Layout/TrailingWhitespace:
 Metrics/MethodLength:
   Enabled: false
 
+Minitest/MultipleAssertions:
+  Enabled: false
+
 Style/Documentation:
   Enabled: false
 
