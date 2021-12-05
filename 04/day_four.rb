@@ -21,7 +21,7 @@ class Board
       end
     end
 
-    @score = remaining_value * called_number if self.winner?
+    @score = remaining_value * called_number if winner?
   end
 
   def winner?
@@ -33,6 +33,7 @@ class Board
   end
 
   private
+
     def remaining_value
       @board.flatten.compact.sum
     end
@@ -51,8 +52,8 @@ class Game
     last_called_number = @numbers.shift
 
     @boards.each { |board| board.mark(last_called_number) }
-    @winning_boards.push(*@boards.select { |board| board.winner? })
-    @boards.reject! { |board| board.winner? }
+    @winning_boards.push(*@boards.select(&:winner?))
+    @boards.reject!(&:winner?)
 
     last_called_number
   end
@@ -78,7 +79,7 @@ if $PROGRAM_NAME == __FILE__
   board_blocks.each { |board_block| boards.push(Board.new(board_block)) }
 
   game = Game.new(numbers, boards)
-  while game.call_number do
+  while game.call_number
     # Waiting for nil
   end
 
