@@ -49,16 +49,6 @@ class BoardTest < MiniTest::Test
 
     assert(@board.winner?)
   end
-
-  def test_remaining_value
-    @board.mark(13)
-    @board.mark(2)
-    @board.mark(9)
-    @board.mark(10)
-    @board.mark(12)
-
-    assert_equal(254, @board.remaining_value)
-  end
 end
 
 class GameTest < MiniTest::Test
@@ -88,55 +78,42 @@ class GameTest < MiniTest::Test
   end
 
   def test_part_one_example
-    @game.call_number
-    assert_equal(7, @game.last_called_number)
+    @game.call_number # 7 called
     refute(@game.winning_boards?)
 
-    @game.call_number
-    assert_equal(4, @game.last_called_number)
+    @game.call_number # 4 called
     refute(@game.winning_boards?)
 
-    @game.call_number
-    assert_equal(9, @game.last_called_number)
+    @game.call_number # 9 called
     refute(@game.winning_boards?)
 
-    @game.call_number
-    assert_equal(5, @game.last_called_number)
+    @game.call_number # 5 called
     refute(@game.winning_boards?)
 
-    @game.call_number
-    assert_equal(11, @game.last_called_number)
+    @game.call_number # 11 called
     refute(@game.winning_boards?)
 
-    @game.call_number
-    assert_equal(17, @game.last_called_number)
+    @game.call_number # 17 called
     refute(@game.winning_boards?)
 
-    @game.call_number
-    assert_equal(23, @game.last_called_number)
+    @game.call_number # 23 called
     refute(@game.winning_boards?)
 
-    @game.call_number
-    assert_equal(2, @game.last_called_number)
+    @game.call_number # 2 called
     refute(@game.winning_boards?)
 
-    @game.call_number
-    assert_equal(0, @game.last_called_number)
+    @game.call_number # 0 called
     refute(@game.winning_boards?)
 
-    @game.call_number
-    assert_equal(14, @game.last_called_number)
+    @game.call_number # 14 called
     refute(@game.winning_boards?)
 
-    @game.call_number
-    assert_equal(21, @game.last_called_number)
+    @game.call_number # 21 called
     refute(@game.winning_boards?)
 
-    @game.call_number
-    assert_equal(24, @game.last_called_number)
+    @game.call_number # 24 called
     assert(@game.winning_boards?)
 
-    assert_equal(188, @game.winning_boards[0].remaining_value)
-    assert_equal(4512, @game.score)
+    assert_equal(4512, @game.winning_boards[0].score)
   end
 end

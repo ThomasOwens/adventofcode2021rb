@@ -3,12 +3,15 @@
 # https://adventofcode.com/2021/day/4
 
 class Board
+  attr_reader :score
+
   def initialize(board_lines)
     @board = []
-
     board_lines.each do |line|
       @board.push(line)
     end
+
+    @score = 0
   end
 
   def mark(called_number)
@@ -17,6 +20,8 @@ class Board
         row[index] = nil if row[index] == called_number
       end
     end
+
+    @score = remaining_value * called_number if self.winner?
   end
 
   def winner?
@@ -27,36 +32,33 @@ class Board
     false
   end
 
-  def remaining_value
-    @board.flatten.compact.sum
-  end
+  private
+    def remaining_value
+      @board.flatten.compact.sum
+    end
 end
 
 class Game
-  attr_reader :last_called_number
+  attr_reader :winning_boards
 
   def initialize(numbers, boards)
     @numbers = numbers
     @boards = boards
-    @last_called_number = 0
+    @winning_boards = []
   end
 
   def call_number
-    @last_called_number = @numbers.shift
+    last_called_number = @numbers.shift
 
-    @boards.each { |board| board.mark(@last_called_number) }
+    @boards.each { |board| board.mark(last_called_number) }
+    @winning_boards.push(*@boards.select { |board| board.winner? })
+    @boards.reject! { |board| board.winner? }
+
+    last_called_number
   end
 
   def winning_boards?
-    @boards.count(&:winner?).positive?
-  end
-
-  def winning_boards
-    @boards.select(&:winner?)
-  end
-
-  def score
-    winning_boards[0].remaining_value * @last_called_number
+    @winning_boards.any?
   end
 end
 
@@ -76,10 +78,10 @@ if $PROGRAM_NAME == __FILE__
   board_blocks.each { |board_block| boards.push(Board.new(board_block)) }
 
   game = Game.new(numbers, boards)
-  loop do
-    game.call_number
-    break if game.winning_boards?
+  while game.call_number do
+    # Waiting for nil
   end
 
-  pp "Part One: #{game.score}" # Expected 35711
+  pp "Part One: #{game.winning_boards.first.score}" # Expected 35711
+  pp "Part Two: #{game.winning_boards.last.score}" # Expected 5586
 end
