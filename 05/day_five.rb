@@ -29,7 +29,7 @@ class HydrothermalVent
     elsif vertical?
       plot_vertical_points
     else
-      []
+      plot_diagonal_points
     end
   end
 
@@ -53,6 +53,21 @@ class HydrothermalVent
       (beginning..ending).each { |y_val| points.push([@start[:x], y_val]) }
 
       points
+    end
+
+    # Diagonal lines will always be 45 degrees.
+    def plot_diagonal_points
+      beginning_x = @start[:x] > @end[:x] ? @end[:x] : @start[:x]
+      ending_x = @start[:x] > @end[:x] ? @start[:x] : @end[:x]
+      xs = (beginning_x..ending_x).to_a
+      xs.reverse! if @end[:x] > @start[:x]
+
+      beginning_y = @start[:y] > @end[:y] ? @end[:y] : @start[:y]
+      ending_y = @start[:y] > @end[:y] ? @start[:y] : @end[:y]
+      ys = (beginning_y..ending_y).to_a
+      ys.reverse! if @end[:y] > @start[:y]
+
+      xs.zip(ys)
     end
 end
 
@@ -98,4 +113,8 @@ if $PROGRAM_NAME == __FILE__
   ocean_floor = OceanFloor.new
   hydrothermal_vents.reject(&:diagonal?).each { |vent| ocean_floor.add_vent(vent) }
   pp "Part 1: #{ocean_floor.dangerous_vent_points.size} dangerous points" # Expected: 5576
+
+  ocean_floor = OceanFloor.new
+  hydrothermal_vents.each { |vent| ocean_floor.add_vent(vent) }
+  pp "Part 2: #{ocean_floor.dangerous_vent_points.size} dangerous points" # Expected: 18144
 end
