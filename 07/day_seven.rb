@@ -8,7 +8,9 @@ class CrabmarineFleet
   end
 
   def fuel_to_move_to(location)
-    @submarine_start_locations.sum { |submarine_location| ((submarine_location - location).abs * ((submarine_location - location).abs + 1))/2 }
+    @submarine_start_locations.sum do |submarine_location|
+      ((submarine_location - location).abs * ((submarine_location - location).abs + 1)) / 2
+    end    
   end
 
   def fuel_to_align(start_loc, end_loc)
