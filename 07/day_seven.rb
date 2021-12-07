@@ -8,7 +8,7 @@ class CrabmarineFleet
   end
 
   def fuel_to_move_to(location)
-    @submarine_start_locations.sum { |submarine_location| (submarine_location - location).abs }
+    @submarine_start_locations.sum { |submarine_location| ((submarine_location - location).abs * ((submarine_location - location).abs + 1))/2 }
   end
 
   def fuel_to_align(start_loc, end_loc)
@@ -31,5 +31,7 @@ if $PROGRAM_NAME == __FILE__
   crabmarine_fleet = CrabmarineFleet.new(crabmarine_locations)
   fuel_to_align = crabmarine_fleet.fuel_to_align(crabmarine_locations.min, crabmarine_locations.max)
 
-  pp "The crabmarine fleet will use #{fuel_to_align.values.first} fuel" # Expected: 329389
+  pp "The crabmarine fleet will use #{fuel_to_align.values.first} fuel"
+  # Part One Expected: 329389
+  # Part Two Expected: 86397080
 end
