@@ -22,11 +22,17 @@ class Heightmap
   end
 
   def basins
-    basins = {}
+    return @basins if @basins
 
-    low_points.each_key { |point| basins[point] = find_basin(point[0], point[1]) }
+    @basins = {}
 
-    basins
+    low_points.each_key { |point| @basins[point] = find_basin(point[0], point[1]) }
+
+    @basins
+  end
+
+  def basin_sizes
+    basins.transform_values(&:length)
   end
 
   def total_risk_level
@@ -94,8 +100,6 @@ if $PROGRAM_NAME == __FILE__
   lines = input_file.readlines
   heightmap = Heightmap.new(lines.map(&:chomp).map(&:chars).map { |row| row.map(&:to_i) })
 
-  pp "Sum of risk levels of all low points: #{heightmap.total_risk_level}" # Expected: 631
-
-  basin_sizes = heightmap.basins.values.map(&:length).sort.reverse
-  pp "Product of three largest basins: #{basin_sizes[0] * basin_sizes[1] * basin_sizes[2]}" # Expected 821560
+  pp "Sum of risk levels of all low points: #{heightmap.total_risk_level}" # 631
+  pp "Product of three largest basins: #{heightmap.basin_sizes.values.sort.reverse.take(3).inject(:*)}" # 821560
 end
