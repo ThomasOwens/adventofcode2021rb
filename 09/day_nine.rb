@@ -45,8 +45,8 @@ class Heightmap
     def find_basin(row, column)
       basin_points = []
 
-      return basin_points if row > @rows - 1 || row < 0
-      return basin_points if column > @columns - 1 || column < 0
+      return basin_points if row > @rows - 1 || row.negative?
+      return basin_points if column > @columns - 1 || column.negative?
       return basin_points if @heightmap[row][column] >= 9
 
       basin_points.append([row, column])
@@ -55,7 +55,7 @@ class Heightmap
       basin_points.append(*find_basin(row + 1, column)) if @heightmap[row][column] < down(row, column)
       basin_points.append(*find_basin(row, column - 1)) if @heightmap[row][column] < left(row, column)
 
-      return basin_points.compact.uniq
+      basin_points.compact.uniq
     end
 
     def risk_level(row, column)
@@ -92,10 +92,10 @@ if $PROGRAM_NAME == __FILE__
 
   input_file = File.new(ARGV[0])
   lines = input_file.readlines
-  heightmap = Heightmap.new(lines.map(&:chomp).map(&:chars).map{ |row| row.map(&:to_i) })
+  heightmap = Heightmap.new(lines.map(&:chomp).map(&:chars).map { |row| row.map(&:to_i) })
 
   pp "Sum of risk levels of all low points: #{heightmap.total_risk_level}" # Expected: 631
 
-  basin_sizes = heightmap.basins.values.map { | basin_points| basin_points.length}.sort.reverse
+  basin_sizes = heightmap.basins.values.map(&:length).sort.reverse
   pp "Product of three largest basins: #{basin_sizes[0] * basin_sizes[1] * basin_sizes[2]}" # Expected 821560
 end
