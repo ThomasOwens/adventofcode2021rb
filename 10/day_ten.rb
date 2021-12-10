@@ -21,6 +21,16 @@ class NavigationSubsystem
     corrupted_lines
   end
 
+  def incomplete_lines
+    unfinished_lines = {}
+
+    (@lines - corrupted_lines.keys).each do |line|
+      unfinished_lines[line] = complete(line)
+    end
+
+    unfinished_lines
+  end
+
   def score_corruption
     score = 0
 
@@ -38,6 +48,33 @@ class NavigationSubsystem
     end
 
     score
+  end
+
+  def score_completions
+    scores = {}
+
+    incomplete_lines.each_value do |completion|
+      score = 0
+      
+      completion.chars.each do |completion_char|
+        score *= 5
+
+        case completion_char
+        when ')'
+          score += 1
+        when ']'
+          score += 2
+        when '}'
+          score += 3
+        when '>'
+          score += 4
+        end
+      end
+
+      scores[completion] = score
+    end
+
+    scores
   end
 
   private
@@ -61,6 +98,33 @@ class NavigationSubsystem
 
       corruption
     end
+
+    def complete(line)
+      left_open = []
+      ending = []
+
+      line.chars.each do |character|
+        left_open.push(character) if OPENING_CHARS.include?(character)
+        left_open.pop if CLOSING_CHARS.include?(character)
+      end
+
+      while left_open.any?
+        next_char = left_open.pop
+
+        case next_char
+        when '('
+          ending.push(')')
+        when '['
+          ending.push(']')
+        when '{'
+          ending.push('}')
+        when '<'
+          ending.push('>')
+        end
+      end
+
+      ending.join
+    end
 end
 
 if $PROGRAM_NAME == __FILE__
@@ -71,5 +135,10 @@ if $PROGRAM_NAME == __FILE__
 
   nav_subsystem = NavigationSubsystem.new(lines)
 
-  pp "Total Syntax Error Score for Corrupted Lines: #{nav_subsystem.score_corruption}" # 288291
+  pp "Syntax Error Score: #{nav_subsystem.score_corruption}"
+  # 288291
+
+  autocomplete_scores = nav_subsystem.score_completions
+  pp "Winning Auto-Complete Score: #{autocomplete_scores.values.sort[autocomplete_scores.length / 2]}"
+  # 820045242
 end
