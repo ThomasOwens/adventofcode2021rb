@@ -60,9 +60,9 @@ class DumboOctopuses
       neighbors.each do |neighbor|
         next if neighbor.nil?
 
-        @octopuses[neighbor[:row]][neighbor[:column]] += 1 unless @step_flashes[@current_step].include?([
-                                                                                                          neighbor[:row], neighbor[:column]
-                                                                                                        ])
+        unless @step_flashes[@current_step].include?([neighbor[:row], neighbor[:column]])
+          @octopuses[neighbor[:row]][neighbor[:column]] += 1
+        end
         octopus_flash(neighbor[:row], neighbor[:column])
       end
     end
