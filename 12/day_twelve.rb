@@ -27,9 +27,9 @@ class CaveSystem
     @cave_system.size
   end
 
-  def paths(from_cave, to_cave)
+  def paths(from_cave, to_cave, can_revisit_small_caves = false)
     paths = []
-    path_search(from_cave, to_cave, paths)
+    path_search(from_cave, to_cave, paths, can_revisit_small_caves)
     paths
   end
 
@@ -37,20 +37,54 @@ class CaveSystem
     cave == cave.upcase
   end
 
+  def self.small_cave?(cave)
+    cave == cave.downcase
+  end
+
   private
 
-    def path_search(current_cave, end_cave, paths = [], path = [], visited = [])
-      visited.append(current_cave) unless CaveSystem.big_cave?(current_cave)
-
+    def path_search(current_cave, end_cave, paths, can_revisit_small_caves, path = [], visited = [])
+      visited.append(current_cave) unless can_revisit?(current_cave, visited, can_revisit_small_caves)
       path.append(current_cave)
 
       if current_cave == end_cave
         paths.append(path)
-        return path
+        return
       end
 
       @cave_system[current_cave].each do |connected_cave|
-        path_search(connected_cave, end_cave, paths, path, visited) unless visited.include?(connected_cave)
+        unless visited.include?(connected_cave)
+          path_search(connected_cave, end_cave, paths, can_revisit_small_caves, path.dup, 
+                      visited.dup)
+        end
       end
     end
+
+    def can_revisit?(current_cave, visited_caves, can_revisit_small_caves)
+      return false if current_cave == 'start'
+      return false if current_cave == 'end'
+      return true if CaveSystem.big_cave?(current_cave)
+
+      if can_revisit_small_caves
+        # TODO This code path grows a stack level that's too deep.
+        return visited_caves.none? { |cave| CaveSystem.small_cave?(cave) && visited_caves.count(cave) >= 2 }
+      else
+        return visited_caves.include?(current_cave)
+      end
+    end
+end
+
+if $PROGRAM_NAME == __FILE__
+  input_file = File.new(ARGV[0])
+  lines = input_file.readlines
+
+  cave_system = CaveSystem.new
+
+  lines.each do |line|
+    caves = line.split('-').map(&:chomp)
+    cave_system.add_tunnel(caves[0], caves[1])
+  end
+
+  pp "Paths: #{cave_system.paths('start', 'end', false).length}" # Part 1: 4707
+  pp "Paths: #{cave_system.paths('start', 'end', true).length}" # Part 2
 end

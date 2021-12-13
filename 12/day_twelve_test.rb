@@ -96,7 +96,7 @@ class CaveSystemTest < MiniTest::Test
     refute(cave_system.connected?('d', 'end'))
   end
 
-  def test_paths
+  def test_part_one
     cave_system = CaveSystem.new
 
     cave_system.add_tunnel('start', 'A')
@@ -107,7 +107,7 @@ class CaveSystemTest < MiniTest::Test
     cave_system.add_tunnel('A', 'end')
     cave_system.add_tunnel('b', 'end')
 
-    paths = cave_system.paths('start', 'end')
+    paths = cave_system.paths('start', 'end', false)
     assert_includes(paths, %w[start A b A c A end])
     assert_includes(paths, %w[start A b A end])
     assert_includes(paths, %w[start A b end])
@@ -117,6 +117,56 @@ class CaveSystemTest < MiniTest::Test
     assert_includes(paths, %w[start A end])
     assert_includes(paths, %w[start b A c A end])
     assert_includes(paths, %w[start b A end])
+    assert_includes(paths, %w[start b end])
+  end
+
+  def test_part_two
+    cave_system = CaveSystem.new
+
+    cave_system.add_tunnel('start', 'A')
+    cave_system.add_tunnel('start', 'b')
+    cave_system.add_tunnel('A', 'c')
+    cave_system.add_tunnel('A', 'b')
+    cave_system.add_tunnel('b', 'd')
+    cave_system.add_tunnel('A', 'end')
+    cave_system.add_tunnel('b', 'end')
+
+    paths = cave_system.paths('start', 'end', true)
+    assert_includes(paths, %w[start A b A b A c A end])
+    assert_includes(paths, %w[start A b A b A end])
+    assert_includes(paths, %w[start A b A b end])
+    assert_includes(paths, %w[start A b A c A b A end])
+    assert_includes(paths, %w[start A b A c A b end])
+    assert_includes(paths, %w[start A b A c A c A end])
+    assert_includes(paths, %w[start A b A c A end])
+    assert_includes(paths, %w[start A b A end])
+    assert_includes(paths, %w[start A b d b A c A end])
+    assert_includes(paths, %w[start A b d b A end])
+    assert_includes(paths, %w[start A b d b end])
+    assert_includes(paths, %w[start A b end])
+    assert_includes(paths, %w[start A c A b A b A end])
+    assert_includes(paths, %w[start A c A b A b end])
+    assert_includes(paths, %w[start A c A b A c A end])
+    assert_includes(paths, %w[start A c A b A end])
+    assert_includes(paths, %w[start A c A b d b A end])
+    assert_includes(paths, %w[start A c A b d b end])
+    assert_includes(paths, %w[start A c A b end])
+    assert_includes(paths, %w[start A c A c A b A end])
+    assert_includes(paths, %w[start A c A c A b end])
+    assert_includes(paths, %w[start A c A c A end])
+    assert_includes(paths, %w[start A c A end])
+    assert_includes(paths, %w[start A end])
+    assert_includes(paths, %w[start b A b A c A end])
+    assert_includes(paths, %w[start b A b A,end])
+    assert_includes(paths, %w[start b A b end])
+    assert_includes(paths, %w[start b A c A b A,end])
+    assert_includes(paths, %w[start b A c A b end])
+    assert_includes(paths, %w[start b A c A c A end])
+    assert_includes(paths, %w[start b A c A end])
+    assert_includes(paths, %w[start b A end])
+    assert_includes(paths, %w[start b d b A c A end])
+    assert_includes(paths, %w[start b d b A end])
+    assert_includes(paths, %w[start b d b end])
     assert_includes(paths, %w[start b end])
   end
 end
