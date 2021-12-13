@@ -28,9 +28,9 @@ class CaveSystem
   end
 
   def paths(from_cave, to_cave)
-    paths = path_search(from_cave, to_cave)
-
-    paths.each { |path| pp path }
+    paths = []
+    path_search(from_cave, to_cave, paths)
+    paths
   end
 
   def self.big_cave?(cave)
@@ -39,26 +39,18 @@ class CaveSystem
 
   private
 
-    def path_search(current_cave, end_cave, path = [], visited = [], paths = [])
-      # TODO Path search is broken. This needs to recursively find and return an array of paths, where each path is
-      # an array of caves. A "small cave" (represented by a lowercase name) can only be visited once per path. A "big
-      # cave" may be visited multiple times. Both the start and the end caves should appear in all of the paths.
-
-      visited.append(current_cave) unless current_cave == CaveSystem.big_cave?(current_cave)
+    def path_search(current_cave, end_cave, paths = [], path = [], visited = [])
+      visited.append(current_cave) unless CaveSystem.big_cave?(current_cave)
 
       path.append(current_cave)
 
-      @cave_system[current_cave].each do |connected_cave|
-        unless visited.include?(connected_cave)
-          paths.append(path_search(connected_cave, end_cave, path, visited, paths))
-        end
-      end
-
       if current_cave == end_cave
         paths.append(path)
-        return paths
+        return path
       end
 
-      paths
+      @cave_system[current_cave].each do |connected_cave|
+        path_search(connected_cave, end_cave, paths, path, visited) unless visited.include?(connected_cave)
+      end
     end
 end

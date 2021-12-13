@@ -107,6 +107,16 @@ class CaveSystemTest < MiniTest::Test
     cave_system.add_tunnel('A', 'end')
     cave_system.add_tunnel('b', 'end')
 
-    cave_system.paths('start', 'A')
+    paths = cave_system.paths('start', 'end')
+    assert_includes(paths, %w[start A b A c A end])
+    assert_includes(paths, %w[start A b A end])
+    assert_includes(paths, %w[start A b end])
+    assert_includes(paths, %w[start A c A b A end])
+    assert_includes(paths, %w[start A c A b end])
+    assert_includes(paths, %w[start A c A end])
+    assert_includes(paths, %w[start A end])
+    assert_includes(paths, %w[start b A c A end])
+    assert_includes(paths, %w[start b A end])
+    assert_includes(paths, %w[start b end])
   end
 end
