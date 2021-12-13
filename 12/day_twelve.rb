@@ -43,8 +43,7 @@ class CaveSystem
 
   private
 
-    def path_search(current_cave, end_cave, paths, can_revisit_small_caves, path = [], visited = [])
-      visited.append(current_cave) unless can_revisit?(current_cave, visited, can_revisit_small_caves)
+    def path_search(current_cave, end_cave, paths, can_revisit_small_caves, path = [])
       path.append(current_cave)
 
       if current_cave == end_cave
@@ -53,23 +52,23 @@ class CaveSystem
       end
 
       @cave_system[current_cave].each do |connected_cave|
-        unless visited.include?(connected_cave)
-          path_search(connected_cave, end_cave, paths, can_revisit_small_caves, path.dup, 
-                      visited.dup)
+        unless fully_visited?(connected_cave, path, can_revisit_small_caves)
+          path_search(connected_cave, end_cave, paths, can_revisit_small_caves, path.dup)
         end
       end
     end
 
-    def can_revisit?(current_cave, visited_caves, can_revisit_small_caves)
-      return false if current_cave == 'start'
-      return false if current_cave == 'end'
-      return true if CaveSystem.big_cave?(current_cave)
+    def fully_visited?(cave, path, can_revisit_small_caves)
+      return true if cave == 'start' && path.include?(cave)
+      return true if cave == 'end' && path.include?(cave)
+      return false if CaveSystem.big_cave?(cave)
 
       if can_revisit_small_caves
-        # TODO This code path grows a stack level that's too deep.
-        return visited_caves.none? { |cave| CaveSystem.small_cave?(cave) && visited_caves.count(cave) >= 2 }
-      else
-        return visited_caves.include?(current_cave)
+        return true if path.include?(cave) && path.count(cave) >= 2
+        return true if path.include?(cave) && path.any? { |past_cave| CaveSystem.small_cave?(past_cave) && path.count(past_cave) >= 2 }
+        return false
+      else # can't revisit small caves
+        return path.include?(cave)
       end
     end
 end
@@ -86,5 +85,5 @@ if $PROGRAM_NAME == __FILE__
   end
 
   pp "Paths: #{cave_system.paths('start', 'end', false).length}" # Part 1: 4707
-  pp "Paths: #{cave_system.paths('start', 'end', true).length}" # Part 2
+  pp "Paths: #{cave_system.paths('start', 'end', true).length}" # Part 2: 130493
 end

@@ -108,6 +108,7 @@ class CaveSystemTest < MiniTest::Test
     cave_system.add_tunnel('b', 'end')
 
     paths = cave_system.paths('start', 'end', false)
+    assert_equal(10, paths.length)
     assert_includes(paths, %w[start A b A c A end])
     assert_includes(paths, %w[start A b A end])
     assert_includes(paths, %w[start A b end])
@@ -132,6 +133,7 @@ class CaveSystemTest < MiniTest::Test
     cave_system.add_tunnel('b', 'end')
 
     paths = cave_system.paths('start', 'end', true)
+    assert_equal(36, paths.length)
     assert_includes(paths, %w[start A b A b A c A end])
     assert_includes(paths, %w[start A b A b A end])
     assert_includes(paths, %w[start A b A b end])
@@ -157,9 +159,9 @@ class CaveSystemTest < MiniTest::Test
     assert_includes(paths, %w[start A c A end])
     assert_includes(paths, %w[start A end])
     assert_includes(paths, %w[start b A b A c A end])
-    assert_includes(paths, %w[start b A b A,end])
+    assert_includes(paths, %w[start b A b A end])
     assert_includes(paths, %w[start b A b end])
-    assert_includes(paths, %w[start b A c A b A,end])
+    assert_includes(paths, %w[start b A c A b A end])
     assert_includes(paths, %w[start b A c A b end])
     assert_includes(paths, %w[start b A c A c A end])
     assert_includes(paths, %w[start b A c A end])
@@ -168,5 +170,43 @@ class CaveSystemTest < MiniTest::Test
     assert_includes(paths, %w[start b d b A end])
     assert_includes(paths, %w[start b d b end])
     assert_includes(paths, %w[start b end])
+  end
+
+  def bigger_examples
+    medium_cave_system = CaveSystem.new
+    medium_cave_system.add_tunnel('dc', 'end')
+    medium_cave_system.add_tunnel('HN', 'start')
+    medium_cave_system.add_tunnel('start', 'kj')
+    medium_cave_system.add_tunnel('dc', 'start')
+    medium_cave_system.add_tunnel('dc', 'HN')
+    medium_cave_system.add_tunnel('LN', 'dc')
+    medium_cave_system.add_tunnel('HN', 'end')
+    medium_cave_system.add_tunnel('kj', 'sa')
+    medium_cave_system.add_tunnel('kj', 'HN')
+    medium_cave_system.add_tunnel('kj', 'dc')
+    assert_equal(19, medium_cave_system.paths('start', 'end', false).length)
+    assert_equal(103, medium_cave_system.paths('start', 'end', true).length)
+
+    large_cave_system = CaveSystem.new
+    large_cave_system.add_tunnel('fs', 'end')
+    large_cave_system.add_tunnel('he', 'DX')
+    large_cave_system.add_tunnel('fs', 'he')
+    large_cave_system.add_tunnel('start', 'DX')
+    large_cave_system.add_tunnel('pj', 'DX')
+    large_cave_system.add_tunnel('end', 'zg')
+    large_cave_system.add_tunnel('zg', 'sl')
+    large_cave_system.add_tunnel('zg', 'pj')
+    large_cave_system.add_tunnel('pj', 'he')
+    large_cave_system.add_tunnel('RW', 'he')
+    large_cave_system.add_tunnel('fs', 'DX')
+    large_cave_system.add_tunnel('pj', 'RW')
+    large_cave_system.add_tunnel('zg', 'RW')
+    large_cave_system.add_tunnel('start', 'pj')
+    large_cave_system.add_tunnel('he', 'WI')
+    large_cave_system.add_tunnel('zg', 'he')
+    large_cave_system.add_tunnel('pj', 'fs')
+    large_cave_system.add_tunnel('start', 'RW')
+    assert_equal(226, large_cave_system.paths('start', 'end', false).length)
+    assert_equal(3509, large_cave_system.paths('start', 'end', true).length)
   end
 end
