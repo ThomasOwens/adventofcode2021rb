@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# https://adventofcode.com/2021/day/12
+# https://adventofcode.com/2021/day/13
 
 class Grid
   attr_reader :points
