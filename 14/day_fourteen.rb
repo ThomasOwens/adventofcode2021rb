@@ -5,29 +5,49 @@
 class Polymerization
   def initialize(polymer_template, pair_insertion_rules)
     @polymer_template = polymer_template
-    @current_polymer = polymer_template.dup
     @pair_insertion_rules = pair_insertion_rules
+    @polymer_pairs = polymer_to_polymer_pairs(@polymer_template)
   end
 
   def pair_insertion_process
-    elements_to_insert = []
+    before_insertion = @polymer_pairs.dup
 
-    @current_polymer.chars.each_cons(2) do |pair|
-      elements_to_insert.append(@pair_insertion_rules[pair.join])
+    before_insertion.each_pair do |pair, count|
+      @polymer_pairs[pair] -= count
+
+      element_to_insert = @pair_insertion_rules[pair]
+      @polymer_pairs[pair[0] + element_to_insert] += count
+      @polymer_pairs[element_to_insert + pair[1]] += count
     end
-
-    @current_polymer = @current_polymer.chars.flat_map { |element| [element, elements_to_insert.shift] }.join
   end
 
   def element_counts
-    elements = @current_polymer.chars.uniq.sort
+    counts = {}
 
-    element_counts = {}
+    counts[@polymer_template[-1]] = 1
 
-    elements.each { |element| element_counts[element] = @current_polymer.count(element) }
+    @polymer_pairs.each_pair do |pair, count|
+      if counts.key?(pair[0])
+        counts[pair[0]] += count
+      else
+        counts[pair[0]] = count
+      end
+    end
 
-    element_counts
+    counts
   end
+
+  private
+
+    def polymer_to_polymer_pairs(polymer_string)
+      polymer_pairs = @pair_insertion_rules.transform_values { |_insertion| 0 }
+
+      polymer_string.chars.each_cons(2) do |polymer_pair|
+        polymer_pairs[polymer_pair.join] += 1
+      end
+
+      polymer_pairs
+    end
 end
 
 if $PROGRAM_NAME == __FILE__
@@ -54,9 +74,11 @@ if $PROGRAM_NAME == __FILE__
 
   10.times { polymerization.pair_insertion_process }
 
-  pp "Quantity of least common element subtracted from quantity of the most common element: #{polymerization.element_counts.values.max - polymerization.element_counts.values.min}"
+  minmax = polymerization.element_counts.values.minmax
+  pp "Quantity of least common element subtracted from quantity of the most common element: #{minmax[1] - minmax[0]}"
 
   30.times { polymerization.pair_insertion_process }
 
-  pp "Quantity of least common element subtracted from quantity of the most common element: #{polymerization.element_counts.values.max - polymerization.element_counts.values.min}"
+  minmax = polymerization.element_counts.values.minmax
+  pp "Quantity of least common element subtracted from quantity of the most common element: #{minmax[1] - minmax[0]}"
 end

@@ -29,19 +29,30 @@ class PolymerizationTest < MiniTest::Test
     polymerization = Polymerization.new(polymer_template, pair_insertion_rules)
 
     # Step 1
-    assert_equal('NCNBCHB', polymerization.pair_insertion_process)
+    polymerization.pair_insertion_process
+
+    pp polymerization.element_counts
+
+    assert_equal(2, polymerization.element_counts['N'])
+    assert_equal(2, polymerization.element_counts['C'])
+    assert_equal(2, polymerization.element_counts['B'])
+    assert_equal(1, polymerization.element_counts['H'])
     assert_equal(7, polymerization.element_counts.values.sum)
 
     # Step 2
-    assert_equal('NBCCNBBBCBHCB', polymerization.pair_insertion_process)
+    polymerization.pair_insertion_process
+    assert_equal(2, polymerization.element_counts['N'])
+    assert_equal(4, polymerization.element_counts['C'])
+    assert_equal(6, polymerization.element_counts['B'])
+    assert_equal(1, polymerization.element_counts['H'])
     assert_equal(13, polymerization.element_counts.values.sum)
 
     # Step 3
-    assert_equal('NBBBCNCCNBBNBNBBCHBHHBCHB', polymerization.pair_insertion_process)
+    polymerization.pair_insertion_process
     assert_equal(25, polymerization.element_counts.values.sum)
 
     # Step 4
-    assert_equal('NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB', polymerization.pair_insertion_process)
+    polymerization.pair_insertion_process
     assert_equal(49, polymerization.element_counts.values.sum)
 
     # Step 5
