@@ -17,31 +17,22 @@ class RiskMap
 
   private
 
-    def paths(current_location, target_location, best_paths, path = [])
-      path.append(current_location)
-      current_path_risk = path_risk(path)
+    def paths(current_location, target_location, best_paths, path = [[], []])
+      path[0].append(current_location)
+      path[1].append(@risk_map[current_location[0]][current_location[1]])
+      current_risk = path[1][1..].sum
 
-      return if best_paths.any? && (current_path_risk > best_paths.values.first)
+      return if best_paths.any? && (current_risk > best_paths.values.first)
 
       if current_location == target_location
-        best_paths.delete_if { |_existing_path, existing_path_risk| existing_path_risk > current_path_risk }
-        best_paths[path] = current_path_risk
+        best_paths.delete_if { |_existing_path, existing_path_risk| existing_path_risk > current_risk }
+        best_paths[path] = current_risk
         return
       end
 
       neighbors(current_location).each do |neighbor|
-        paths(neighbor, target_location, best_paths, path.dup) unless path.include?(neighbor)
+        paths(neighbor, target_location, best_paths, [path[0].dup, path[1].dup]) unless path[0].include?(neighbor)
       end
-    end
-
-    def path_risk(path)
-      cumulative_risk = 0
-
-      path.slice(1..-1).each do |location|
-        cumulative_risk += @risk_map[location[0]][location[1]]
-      end
-
-      cumulative_risk
     end
 
     def neighbors(source)
@@ -64,5 +55,5 @@ if $PROGRAM_NAME == __FILE__
   best_paths = risk_map.navigate
 
   pp "Total Paths: #{best_paths.size} "
-  pp "Lowest Total Risk: #{best_paths.values.first}"
+  pp "Lowest Total Risk: #{best_paths.first[1]}"
 end
