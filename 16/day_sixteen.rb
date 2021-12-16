@@ -47,11 +47,11 @@ class Packet
     when 4
       @groups.join.to_i(2)
     when 5
-      (@subpackets[0].value > @subpackets[1].value ? 1 : 0)
+      @subpackets[0].value > @subpackets[1].value ? 1 : 0
     when 6
-      (@subpackets[0].value < @subpackets[1].value ? 1 : 0)
+      @subpackets[0].value < @subpackets[1].value ? 1 : 0
     when 7
-      (@subpackets[0].value == @subpackets[1].value ? 1 : 0)
+      @subpackets[0].value == @subpackets[1].value ? 1 : 0
     end
   end
 
@@ -87,12 +87,13 @@ class Packet
         @subpackets = []
 
         if @length_type_id == '0'
-          binary_string.slice!(0..14)
+          subpackets_length = binary_string.slice!(0..14).to_i(2)
+          packet_data = binary_string.slice!(0..(subpackets_length-1))
 
-          while binary_string.size > 11 # 11 is the minimum size for a subpacket
-            @subpackets.push(Packet.new(binary_string))
+          while !packet_data.empty?
+            @subpackets.push(Packet.new(packet_data))
           end
-        else # parsed_packet['length_type_id'] == '1'
+        else
           number_of_subpackets = binary_string.slice!(0..10).to_i(2)
 
           @subpackets.push(Packet.new(binary_string)) while @subpackets.length < number_of_subpackets
