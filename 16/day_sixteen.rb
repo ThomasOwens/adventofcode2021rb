@@ -22,43 +22,91 @@ class Packet
     'F' => '1111'
   }.freeze
 
-  def self.parse_packet(binary_string)
-    parsed_packet = {}
+  attr_reader :version, :type_id, :length_type_id, :subpackets
 
-    parsed_packet[:version] = binary_string.slice!(0..2).to_i(2)
-    parsed_packet[:type_id] = binary_string.slice!(0..2).to_i(2)
+  def initialize(packet_binary_string)
+    parse_binary_string(packet_binary_string)
+  end
 
-    if parsed_packet[:type_id] == 4 # literal value that encodes a single binary number
-      parsed_packet[:group_a] = binary_string.slice!(0..4).slice(1..4)
-      parsed_packet[:group_b] = binary_string.slice!(0..4).slice(1..4)
-      parsed_packet[:group_c] = binary_string.slice!(0..4).slice(1..4)
-      parsed_packet[:literal_value_bin] = parsed_packet[:group_a] + parsed_packet[:group_b] + parsed_packet[:group_c]
-      parsed_packet[:literal_value_dec] = parsed_packet[:literal_value_bin].to_i(2)
-    else # packet is an operator
-      parsed_packet[:length_type_id] = binary_string.slice!(0)
-      parsed_packet[:subpackets] = []
+  def number_of_subpackets
+    @subpackets.length
+  end
 
-      if parsed_packet[:length_type_id] == '0'
-        length_of_subpackets = binary_string.slice!(0..14)
+  def value
+    # This returns an incorrect value for Part 2, but none of the existing tests expose the issue.
 
-        while binary_string.size > 0 do
-          # TODO This is failing to fully parse the packets and causing exceptions.
-          parsed_packet[:subpackets].push(parse_packet(binary_string))
+    case @type_id
+    when 0
+      @subpackets.sum(&:value)
+    when 1
+      @subpackets.map(&:value).reduce(:*)
+    when 2
+      @subpackets.map(&:value).min
+    when 3
+      @subpackets.map(&:value).max
+    when 4
+      @groups.join.to_i(2)
+    when 5
+      (@subpackets[0].value > @subpackets[1].value ? 1 : 0)
+    when 6
+      (@subpackets[0].value < @subpackets[1].value ? 1 : 0)
+    when 7
+      (@subpackets[0].value == @subpackets[1].value ? 1 : 0)
+    end
+  end
+
+  def version_sum
+    version_sum = version
+
+    version_sum += subpackets.sum(&:version_sum) unless subpackets.nil?
+
+    version_sum
+  end
+
+  def self.hex_string_to_binary_string(hex_string)
+    hex_string.chars.map { |hex_char| HEX_TO_BINARY[hex_char] }.join
+  end
+
+  private
+
+    def parse_binary_string(binary_string)
+      @version = binary_string.slice!(0..2).to_i(2)
+      @type_id = binary_string.slice!(0..2).to_i(2)
+
+      if @type_id == 4
+        @groups = []
+
+        loop do
+          break_char = binary_string.slice!(0)
+          @groups.push(binary_string.slice!(0..3))
+
+          break if break_char == '0'
         end
-      else # parsed_packet['length_type_id'] == '1'
-        parsed_packet[:number_of_subpackets] = binary_string.slice!(0..10).to_i(2)
+      else
+        @length_type_id = binary_string.slice!(0)
+        @subpackets = []
 
-        while parsed_packet[:subpackets].length > parsed_packet[:number_of_subpackets] do
-          # TODO This isn't appending to the subpackets array.
-          parsed_packet[:subpackets].push(parse_packet(binary_string))
+        if @length_type_id == '0'
+          binary_string.slice!(0..14)
+
+          while binary_string.size > 11 # 11 is the minimum size for a subpacket
+            @subpackets.push(Packet.new(binary_string))
+          end
+        else # parsed_packet['length_type_id'] == '1'
+          number_of_subpackets = binary_string.slice!(0..10).to_i(2)
+
+          @subpackets.push(Packet.new(binary_string)) while @subpackets.length < number_of_subpackets
         end
       end
     end
+end
 
-    parsed_packet
-  end
+if $PROGRAM_NAME == __FILE__
+  input_file = File.new(ARGV[0])
+  line = input_file.readline
 
-  def self.parse_hex_string(hex_string)
-    hex_string.chars.map { |hex_char| HEX_TO_BINARY[hex_char] }.join
-  end
+  packet = Packet.new(Packet.hex_string_to_binary_string(line))
+
+  pp "Version Sum: #{packet.version_sum}" # Expected: 984
+  pp "Value: #{packet.value}"
 end
