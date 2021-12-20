@@ -19,8 +19,8 @@ class RiskMapTest < MiniTest::Test
     ]
 
     risk_map = RiskMap.new(risk_map_grid)
-    best_paths = risk_map.navigate
+    _, risk = risk_map.navigate
 
-    assert_equal(40, best_paths.first[1])
+    assert_equal(40, risk)
   end
 end
