@@ -38,7 +38,7 @@ class RiskMapTest < MiniTest::Test
       [2, 3, 1, 1, 9, 4, 4, 5, 8, 1]
     ]
 
-    expanded_example_risk_map_grid = [
+    expanded_risk_map = [
       [1, 1, 6, 3, 7, 5, 1, 7, 4, 2, 2, 2, 7, 4, 8, 6, 2, 8, 5, 3, 3, 3, 8, 5, 9, 7, 3, 9, 6, 4, 4, 4, 9, 6, 1, 8, 4, 
        1, 7, 5, 5, 5, 1, 7, 2, 9, 5, 2, 8, 6],
       [1, 3, 8, 1, 3, 7, 3, 6, 7, 2, 2, 4, 9, 2, 4, 8, 4, 7, 8, 3, 3, 5, 1, 3, 5, 9, 5, 8, 9, 4, 4, 6, 2, 4, 6, 1, 6, 
@@ -143,9 +143,9 @@ class RiskMapTest < MiniTest::Test
 
     risk_map = RiskMap.new(risk_map_grid, 5)
 
-    (0..(expanded_example_risk_map_grid.size - 1)).each do |row_num|
-      (0..(expanded_example_risk_map_grid.first.size - 1)).each do |column_num|
-        assert_equal(expanded_example_risk_map_grid[row_num][column_num], risk_map.send(:risk, row_num, column_num), 
+    (0..(expanded_risk_map.size - 1)).each do |row_num|
+      (0..(expanded_risk_map.first.size - 1)).each do |column_num|
+        assert_equal(expanded_risk_map[row_num][column_num], risk_map.send(:risk, row_num, column_num), 
                      "[#{row_num}][#{column_num}]")
       end
     end

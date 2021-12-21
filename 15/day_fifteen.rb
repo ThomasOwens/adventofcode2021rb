@@ -16,7 +16,6 @@ class RiskMap
   def navigate
     start_location = [0, 0]
     target_location = [@height - 1, @width - 1]
-
     _, previous = pathfinding(start_location, target_location)
 
     path = []
@@ -36,7 +35,7 @@ class RiskMap
       col_factor, reading_column = column_num.divmod(@reading_width)
 
       risk = @risk_map[reading_row][reading_column] + row_factor + col_factor
-      risk = ((risk % 9) + 1) if risk > 9
+      risk = (risk % 9) if risk > 9
 
       risk
     end
@@ -86,6 +85,7 @@ class RiskMap
       neighbors.push([location[0] + 1, location[1]]) if location[0] + 1 < @height # Down
       neighbors.push([location[0], location[1] - 1]) if location[1] - 1 >= 0 # Left
 
+      #neighbors.sort_by! { |neighbor| risk(neighbor[0], neighbor[1]) }
       neighbors
     end
 
@@ -113,4 +113,7 @@ if $PROGRAM_NAME == __FILE__
   pp "Lowest Risk: #{risk}" # Expected: 540
 
   # Expand the map for part 2
+  risk_map = RiskMap.new(risk_map_grid, 5)
+  _, risk = risk_map.navigate
+  pp "Lowest Risk: #{risk}"
 end
