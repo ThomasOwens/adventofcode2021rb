@@ -5,10 +5,12 @@
 require 'benchmark'
 
 class RiskMap
-  def initialize(risk_map)
+  def initialize(risk_map, repeating = 1)
     @risk_map = risk_map
-    @height = risk_map.length
-    @width = risk_map.first.length # Assuming all are equal
+    @reading_height = risk_map.length
+    @reading_width = risk_map.first.length
+    @height = risk_map.length * repeating
+    @width = risk_map.first.length * repeating
   end
 
   def navigate
@@ -28,6 +30,16 @@ class RiskMap
   end
 
   private
+
+    def risk(row_num, column_num)
+      row_factor, reading_row = row_num.divmod(@reading_height)
+      col_factor, reading_column = column_num.divmod(@reading_width)
+
+      risk = @risk_map[reading_row][reading_column] + row_factor + col_factor
+      risk = ((risk % 9) + 1) if risk > 9
+
+      risk
+    end
 
     def pathfinding(start_location, target_location)
       locations_to_visit = []
@@ -54,7 +66,7 @@ class RiskMap
         neighbors(current_location).each do |neighbor|
           next unless locations_to_visit.include?(neighbor)
 
-          distance = distances[current_location] + @risk_map[neighbor[0]][neighbor[1]]
+          distance = distances[current_location] + risk(neighbor[0], neighbor[1])
 
           if distance < distances[neighbor]
             distances[neighbor] = distance
@@ -83,7 +95,7 @@ class RiskMap
       path.each_with_index do |location, index|
         next if index.zero?
 
-        cumulative_risk += @risk_map[location[0]][location[1]]
+        cumulative_risk += risk(location[0], location[1])
       end
 
       cumulative_risk
